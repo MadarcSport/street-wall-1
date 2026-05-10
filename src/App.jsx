@@ -39,7 +39,7 @@ export default function App() {
         dpr={lowTierDevice ? [1, 1.5] : [1, 2]}
         // Keep antialias true unless you are using Post-Processing
         gl={{
-          antialias: !lowTierDevice,
+          antialias: true,
           alpha: false,
           stencil: false,
           depth: true,

@@ -102,27 +102,50 @@ export default function Scene({
   // Refresh texture/material flags once after model load.
   useEffect(() => {
     if (gltf && gltf.scene) {
+      const maxAnisotropy = gl.capabilities.getMaxAnisotropy();
+      const anisotropy = lowTierDevice
+        ? Math.min(4, maxAnisotropy)
+        : Math.min(8, maxAnisotropy);
+
+      const configureTexture = (texture, colorTexture = false) => {
+        if (!texture) return;
+        if (colorTexture) texture.colorSpace = THREE.SRGBColorSpace;
+        texture.generateMipmaps = true;
+        texture.minFilter = THREE.LinearMipmapLinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        texture.anisotropy = anisotropy;
+        texture.needsUpdate = true;
+      };
+
       gltf.scene.traverse((child) => {
         if (child.isMesh) {
           try {
             const mat = child.material;
-            if (mat && mat.map) {
-              // ensure color textures are interpreted correctly
-              mat.map.colorSpace = THREE.SRGBColorSpace;
-              if (lowTierDevice) {
-                mat.map.generateMipmaps = false;
-                mat.map.minFilter = THREE.LinearFilter;
-              }
-              mat.map.needsUpdate = true;
+            if (mat) {
+              const materials = Array.isArray(mat) ? mat : [mat];
+
+              materials.forEach((material) => {
+                configureTexture(material.map, true);
+                configureTexture(material.normalMap);
+                configureTexture(material.roughnessMap);
+                configureTexture(material.metalnessMap);
+                configureTexture(material.aoMap);
+
+                if (material.normalScale) {
+                  const normalStrength = lowTierDevice ? 0.35 : 0.7;
+                  material.normalScale.set(normalStrength, normalStrength);
+                }
+
+                material.needsUpdate = true;
+              });
             }
-            if (mat) mat.needsUpdate = true;
           } catch (e) {
             // Ignore per-material refresh errors to keep rendering alive.
           }
         }
       });
     }
-  }, [gltf, lowTierDevice]);
+  }, [gltf, gl, lowTierDevice]);
 
   // Lighting setup similar to original
   useFrame(() => {
