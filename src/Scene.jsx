@@ -10,6 +10,7 @@ export default function Scene({
   rotRight,
   onModelClick,
   envIntensity = 1,
+  sceneBrightness = 1,
   lowTierDevice = false,
 }) {
   const group = useRef();
@@ -140,27 +141,27 @@ export default function Scene({
 
       materials.forEach((mat) => {
         if ("envMapIntensity" in mat) {
-          mat.envMapIntensity = envIntensity;
+          mat.envMapIntensity = lowTierDevice
+            ? Math.min(Math.max(envIntensity, 1.35) * sceneBrightness, 3)
+            : envIntensity;
           mat.needsUpdate = true;
         }
       });
     });
-  }, [gltf, envIntensity]);
+  }, [gltf, envIntensity, lowTierDevice, sceneBrightness]);
 
   return (
     <>
-      {!lowTierDevice ? (
-        <Environment files="/studio2.hdr" resolution={64} />
-      ) : null}
+      <Environment files="/studio2.hdr" resolution={lowTierDevice ? 16 : 64} />
       {/* <Environment files="/rosendal.hdr" /> */}
       <hemisphereLight
         args={["#cfe8ff", "#ffffff", 0.45]}
         position={[100, 300, 100]}
       />
-      <ambientLight intensity={lowTierDevice ? 0.5 : 0.65} />
+      <ambientLight intensity={lowTierDevice ? 0.85 * sceneBrightness : 0.65} />
       <directionalLight
         position={[-50, -100, 100]}
-        intensity={lowTierDevice ? 20 : 20}
+        intensity={lowTierDevice ? 34 * sceneBrightness : 20}
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
       />
@@ -170,7 +171,12 @@ export default function Scene({
           <directionalLight position={[-50, 200, 100]} intensity={90} />
           <pointLight position={[-300, -100, -300]} intensity={30} />
         </>
-      ) : null}
+      ) : (
+        <pointLight
+          position={[-300, -100, -300]}
+          intensity={45 * sceneBrightness}
+        />
+      )}
 
       <group ref={group} position={[0, 0, 0]} scale={[1, 1, 1]}>
         {gltf && gltf.scene ? (

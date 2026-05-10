@@ -8,6 +8,7 @@ export default function App() {
   const [rotRight, setRotRight] = useState(false);
   const [showClickText, setShowClickText] = useState(false);
   const [envIntensity, setEnvIntensity] = useState(1);
+  const [mobileBrightness, setMobileBrightness] = useState(1.1);
   const [contextLost, setContextLost] = useState(false);
 
   const lowTierDevice = useMemo(() => {
@@ -36,9 +37,9 @@ export default function App() {
           preserveDrawingBuffer: false,
           powerPreference: lowTierDevice ? "low-power" : "high-performance",
           toneMapping: lowTierDevice
-            ? THREE.NoToneMapping
+            ? THREE.LinearToneMapping
             : THREE.ACESFilmicToneMapping,
-          toneMappingExposure: lowTierDevice ? 1 : 1.1,
+          toneMappingExposure: lowTierDevice ? 1.35 * mobileBrightness : 1.1,
         }}
         onCreated={({ gl }) => {
           const onContextLost = (event) => {
@@ -69,6 +70,7 @@ export default function App() {
             rotLeft={rotLeft}
             rotRight={rotRight}
             envIntensity={envIntensity}
+            sceneBrightness={mobileBrightness}
             lowTierDevice={lowTierDevice}
             onModelClick={() => setShowClickText(true)}
           />
@@ -102,7 +104,21 @@ export default function App() {
               onChange={(event) => setEnvIntensity(Number(event.target.value))}
             />
           </label>
-        ) : null}
+        ) : (
+          <label className="env-control">
+            Brightness: {mobileBrightness.toFixed(2)}
+            <input
+              type="range"
+              min="0.8"
+              max="2.2"
+              step="0.05"
+              value={mobileBrightness}
+              onChange={(event) =>
+                setMobileBrightness(Number(event.target.value))
+              }
+            />
+          </label>
+        )}
       </div>
 
       {/* Show click message if the model was clicked */}
