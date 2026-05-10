@@ -27,7 +27,7 @@ export default function App() {
   const cameraConfig = useMemo(
     () =>
       lowTierDevice
-        ? { position: [1, 6, 20], fov: 52 }
+        ? { position: [1, 2, 15], fov: 52 }
         : { position: [1, 0.8, 15], fov: 45 },
     [lowTierDevice],
   );
@@ -125,7 +125,7 @@ export default function App() {
             <input
               type="range"
               min="0.8"
-              max="2.2"
+              max="3.2"
               step="0.05"
               value={mobileBrightness}
               onChange={(event) =>

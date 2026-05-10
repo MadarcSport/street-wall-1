@@ -37,14 +37,16 @@ function ProductCard({ product }) {
 
 export default ProductCard;
 
+const asset = (file) => `${import.meta.env.BASE_URL}${file}`;
+
 export const citrusMatchaTea = {
-  defaultImage: "public/wall3.jpg",
+  defaultImage: asset("wall3.jpg"),
   hoverImage:
     "https://raw.githubusercontent.com/MadarcSport/pulsius/79342eb31f1fd31d15931c222c596182fd92254d/Can-pulsius-steam-001.gif",
   title: "Citrus & Matcha Tea",
   thumbnails: [
-    { src: "public/wall3.jpg", alt: "Product 1" },
-    { src: "public/wall2.jpg", alt: "Product 1" },
-    { src: "public/wall1.jpg", alt: "Product 1" },
+    { src: asset("wall3.jpg"), alt: "Product 1" },
+    { src: asset("wall2.jpg"), alt: "Product 1" },
+    { src: asset("wall1.jpg"), alt: "Product 1" },
   ],
 };
