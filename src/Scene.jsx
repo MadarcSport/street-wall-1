@@ -14,6 +14,11 @@ export default function Scene({
   lowTierDevice = false,
 }) {
   const group = useRef();
+  const desktopLightScale = THREE.MathUtils.lerp(
+    0.4,
+    1.6,
+    THREE.MathUtils.clamp(envIntensity / 3, 0, 1),
+  );
   const dragState = useRef({
     isDragging: false,
     pointerId: null,
@@ -158,18 +163,33 @@ export default function Scene({
         args={["#cfe8ff", "#ffffff", 0.45]}
         position={[100, 300, 100]}
       />
-      <ambientLight intensity={lowTierDevice ? 0.85 * sceneBrightness : 0.65} />
+      <ambientLight
+        intensity={
+          lowTierDevice ? 0.85 * sceneBrightness : 0.65 * desktopLightScale
+        }
+      />
       <directionalLight
         position={[-50, -100, 100]}
-        intensity={lowTierDevice ? 34 * sceneBrightness : 20}
+        intensity={
+          lowTierDevice ? 34 * sceneBrightness : 20 * desktopLightScale
+        }
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
       />
       {!lowTierDevice ? (
         <>
-          <directionalLight position={[-500, -400, 300]} intensity={100} />
-          <directionalLight position={[-50, 200, 100]} intensity={90} />
-          <pointLight position={[-300, -100, -300]} intensity={30} />
+          <directionalLight
+            position={[-500, -400, 300]}
+            intensity={100 * desktopLightScale}
+          />
+          <directionalLight
+            position={[-50, 200, 100]}
+            intensity={90 * desktopLightScale}
+          />
+          <pointLight
+            position={[-300, -100, -300]}
+            intensity={30 * desktopLightScale}
+          />
         </>
       ) : (
         <pointLight

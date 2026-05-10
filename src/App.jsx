@@ -23,6 +23,14 @@ export default function App() {
     return mem <= 4 || cores <= 4 || isMobileUA;
   }, []);
 
+  const cameraConfig = useMemo(
+    () =>
+      lowTierDevice
+        ? { position: [1, 6, 20], fov: 52 }
+        : { position: [1, 0.8, 15], fov: 45 },
+    [lowTierDevice],
+  );
+
   return (
     <div className="app-root">
       <Canvas
@@ -62,7 +70,7 @@ export default function App() {
             false,
           );
         }}
-        camera={{ position: [1, 0.8, 15], fov: 45 }}
+        camera={cameraConfig}
         style={{ width: "80vw", height: "60vh" }}
       >
         <Suspense fallback={null}>
