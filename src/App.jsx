@@ -1,4 +1,4 @@
-import React, { useState, Suspense } from "react";
+import React, { useMemo, useState, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
 import Scene from "./Scene";
@@ -10,17 +10,35 @@ export default function App() {
   const [envIntensity, setEnvIntensity] = useState(1);
   const [contextLost, setContextLost] = useState(false);
 
+  const lowTierDevice = useMemo(() => {
+    if (typeof navigator === "undefined") return false;
+
+    const mem = navigator.deviceMemory ?? 8;
+    const cores = navigator.hardwareConcurrency ?? 8;
+    const isMobileUA = /Android|iPhone|iPad|iPod|Mobile/i.test(
+      navigator.userAgent,
+    );
+
+    return mem <= 4 || cores <= 4 || isMobileUA;
+  }, []);
+
   return (
     <div className="app-root">
       <Canvas
-        dpr={[1, 1.5]}
+        dpr={lowTierDevice ? [1, 1] : [1, 1.25]}
         shadows={false}
-        performance={{ min: 0.6 }}
+        performance={{ min: lowTierDevice ? 0.4 : 0.6 }}
         gl={{
           antialias: false,
-          powerPreference: "high-performance",
-          toneMapping: THREE.ACESFilmicToneMapping,
-          toneMappingExposure: 1.1,
+          alpha: false,
+          stencil: false,
+          depth: true,
+          preserveDrawingBuffer: false,
+          powerPreference: lowTierDevice ? "low-power" : "high-performance",
+          toneMapping: lowTierDevice
+            ? THREE.NoToneMapping
+            : THREE.ACESFilmicToneMapping,
+          toneMappingExposure: lowTierDevice ? 1 : 1.1,
         }}
         onCreated={({ gl }) => {
           const onContextLost = (event) => {
@@ -51,6 +69,7 @@ export default function App() {
             rotLeft={rotLeft}
             rotRight={rotRight}
             envIntensity={envIntensity}
+            lowTierDevice={lowTierDevice}
             onModelClick={() => setShowClickText(true)}
           />
         </Suspense>
@@ -71,17 +90,19 @@ export default function App() {
         >
           Rotate Right
         </button>
-        <label className="env-control">
-          Environment: {envIntensity.toFixed(2)}
-          <input
-            type="range"
-            min="0"
-            max="3"
-            step="0.05"
-            value={envIntensity}
-            onChange={(event) => setEnvIntensity(Number(event.target.value))}
-          />
-        </label>
+        {!lowTierDevice ? (
+          <label className="env-control">
+            Environment: {envIntensity.toFixed(2)}
+            <input
+              type="range"
+              min="0"
+              max="3"
+              step="0.05"
+              value={envIntensity}
+              onChange={(event) => setEnvIntensity(Number(event.target.value))}
+            />
+          </label>
+        ) : null}
       </div>
 
       {/* Show click message if the model was clicked */}

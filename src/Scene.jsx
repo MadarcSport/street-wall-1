@@ -10,6 +10,7 @@ export default function Scene({
   rotRight,
   onModelClick,
   envIntensity = 1,
+  lowTierDevice = false,
 }) {
   const group = useRef();
   const dragState = useRef({
@@ -26,44 +27,6 @@ export default function Scene({
   });
 
   useEffect(() => {
-    console.log("useGLTF result:", gltf);
-  }, [gltf]);
-
-  // Log images referenced in the glTF JSON (helps identify external texture URIs)
-  useEffect(() => {
-    try {
-      const imgs = gltf?.parser?.json?.images;
-      if (imgs && imgs.length) {
-        console.log(
-          "gltf referenced images:",
-          imgs.map((i) => i.uri || i.mimeType || i.bufferView || i),
-        );
-      }
-    } catch (e) {
-      // ignore
-    }
-  }, [gltf]);
-
-  // Inspect materials and texture sources to diagnose missing textures
-  useEffect(() => {
-    if (gltf && gltf.scene) {
-      gltf.scene.traverse((child) => {
-        if (child.isMesh) {
-          const mat = child.material;
-          const info = {
-            materialType: mat?.type,
-            hasMap: !!mat?.map,
-            mapImageSrc:
-              mat?.map?.image?.src || mat?.map?.image?.currentSrc || null,
-            color: mat?.color ? `#${mat.color.getHexString()}` : null,
-          };
-          console.log("material info:", child.name, info);
-        }
-      });
-    }
-  }, [gltf]);
-
-  useEffect(() => {
     if (gltf && gltf.scene) {
       // Compute bounding box and center the model so it's easier to see
       const box = new THREE.Box3().setFromObject(gltf.scene);
@@ -72,7 +35,6 @@ export default function Scene({
       gltf.scene.position.x -= center.x;
       gltf.scene.position.y -= center.y;
       gltf.scene.position.z -= center.z;
-      console.log("gltf boundingBox:", box, "center:", center);
     }
   }, [gltf]);
 
@@ -131,33 +93,30 @@ export default function Scene({
     };
   }, [gl, gltf]);
 
-  // Debug: log mesh info and refresh any existing texture maps (don't overwrite materials)
+  // Refresh texture/material flags once after model load.
   useEffect(() => {
     if (gltf && gltf.scene) {
       gltf.scene.traverse((child) => {
         if (child.isMesh) {
-          console.log("mesh:", child.name, {
-            visible: child.visible,
-            geometry: !!child.geometry,
-            material: child.material && child.material.type,
-          });
           try {
             const mat = child.material;
             if (mat && mat.map) {
               // ensure color textures are interpreted correctly
               mat.map.colorSpace = THREE.SRGBColorSpace;
+              if (lowTierDevice) {
+                mat.map.generateMipmaps = false;
+                mat.map.minFilter = THREE.LinearFilter;
+              }
               mat.map.needsUpdate = true;
             }
             if (mat) mat.needsUpdate = true;
-            child.castShadow = true;
-            child.receiveShadow = true;
           } catch (e) {
-            console.warn("failed to refresh material for", child.name, e);
+            // Ignore per-material refresh errors to keep rendering alive.
           }
         }
       });
     }
-  }, [gltf]);
+  }, [gltf, lowTierDevice]);
 
   // Lighting setup similar to original
   useFrame(() => {
@@ -190,22 +149,28 @@ export default function Scene({
 
   return (
     <>
-      <Environment files="/studio2.hdr" resolution={128} />
+      {!lowTierDevice ? (
+        <Environment files="/studio2.hdr" resolution={64} />
+      ) : null}
       {/* <Environment files="/rosendal.hdr" /> */}
       <hemisphereLight
         args={["#cfe8ff", "#3a2f24", 0.45]}
         position={[0, 500, 0]}
       />
-      <ambientLight intensity={0.65} />
+      <ambientLight intensity={lowTierDevice ? 0.5 : 0.65} />
       <directionalLight
         position={[50, 100, 100]}
-        intensity={2.2}
+        intensity={lowTierDevice ? 1.2 : 2.2}
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
       />
-      <directionalLight position={[-500, -400, 300]} intensity={0.8} />
-      <directionalLight position={[0, 20, -80]} intensity={0.6} />
-      <pointLight position={[300, 100, 300]} intensity={1.2} />
+      {!lowTierDevice ? (
+        <>
+          <directionalLight position={[-500, -400, 300]} intensity={0.8} />
+          <directionalLight position={[0, 20, -80]} intensity={0.6} />
+          <pointLight position={[300, 100, 300]} intensity={1.2} />
+        </>
+      ) : null}
 
       <group ref={group} position={[0, 0, 0]} scale={[1, 1, 1]}>
         {gltf && gltf.scene ? (
@@ -217,7 +182,7 @@ export default function Scene({
             }}
           />
         ) : null}
-        <axesHelper args={[0.5]} />
+        {!lowTierDevice ? <axesHelper args={[0.5]} /> : null}
       </group>
 
       {/* Keep camera locked; model rotation is handled by buttons and pointer dragging. */}
