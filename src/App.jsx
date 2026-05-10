@@ -2,6 +2,7 @@ import React, { useMemo, useState, Suspense } from "react";
 import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
 import Scene from "./Scene";
+import ProductCard, { citrusMatchaTea } from "./List1";
 
 export default function App() {
   const [rotLeft, setRotLeft] = useState(false);
@@ -34,22 +35,24 @@ export default function App() {
   return (
     <div className="app-root">
       <Canvas
-        dpr={lowTierDevice ? [1, 1] : [1, 1.25]}
-        shadows={false}
-        performance={{ min: lowTierDevice ? 0.4 : 0.6 }}
+        // Cap DPR at 2 to keep it sharp without killing the GPU
+        dpr={lowTierDevice ? [1, 1.5] : [1, 2]}
+        // Keep antialias true unless you are using Post-Processing
         gl={{
-          antialias: false,
+          antialias: !lowTierDevice,
           alpha: false,
           stencil: false,
           depth: true,
-          preserveDrawingBuffer: false,
           powerPreference: lowTierDevice ? "low-power" : "high-performance",
-          toneMapping: lowTierDevice
-            ? THREE.LinearToneMapping
-            : THREE.ACESFilmicToneMapping,
-          toneMappingExposure: lowTierDevice ? 1.35 * mobileBrightness : 1.1,
+          // ACESFilmic is standard for a "modern" look
+          toneMapping: THREE.ACESFilmicToneMapping,
         }}
+        // Use 'demand' frameloop if the scene isn't constantly moving to save battery
+        frameloop={lowTierDevice ? "always" : "always"}
+        performance={{ min: 0.5 }}
         onCreated={({ gl }) => {
+          gl.setClearColor("#f0f0f0");
+
           const onContextLost = (event) => {
             event.preventDefault();
             setContextLost(true);
@@ -84,6 +87,10 @@ export default function App() {
           />
         </Suspense>
       </Canvas>
+
+      {/* <section className="list-section">
+        <ProductCard product={citrusMatchaTea} />
+      </section> */}
 
       <div className="controls">
         <button
@@ -131,6 +138,9 @@ export default function App() {
 
       {/* Show click message if the model was clicked */}
       {showClickText ? <p className="click-message">Stay strong can.</p> : null}
+      <section className="list-section">
+        <ProductCard product={citrusMatchaTea} />
+      </section>
 
       {contextLost ? (
         <p className="click-message">

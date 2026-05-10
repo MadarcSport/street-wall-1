@@ -3,9 +3,11 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background-color: #ffffff;
+  justify-content: flex-start;
+  min-height: 100vh;
+  background-color: #f1f1f1;
+  padding: 24px 0 40px;
+  box-sizing: border-box;
 }
 
 canvas {
@@ -31,6 +33,7 @@ button {
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 100%;
 }
 
 .click-message {
@@ -54,11 +57,83 @@ button {
 canvas {
   border-radius: 8px;
   /* background: #141414; */
-  background: #000000;
-  background: linear-gradient(
+  background: #edeaea;
+  /* background: linear-gradient(
     163deg,
     rgba(0, 0, 0, 1) 29%,
     rgba(89, 89, 117, 1) 100%,
     rgba(34, 34, 56, 1) 73%
-  );
+  ); */
+}
+
+.gallery {
+  background: rgb(255, 255, 255);
+  border-radius: 10px;
+  padding: 1px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  flex: 1 1 850px;
+  max-width: 850px;
+  position: relative;
+  margin: 40px 0;
+}
+
+.main-image {
+  width: 80%;
+  padding-top: 25px;
+  margin: 0 auto;
+  position: relative;
+  cursor:
+    url("https://raw.githubusercontent.com/MadarcSport/my-websites-images/2a5200e098f527763927a8ad0f9a30834587e7f6/images/cursorWatchMousse.svg")
+      24 24,
+    pointer;
+}
+
+.main-image img {
+  width: 100%;
+  border-radius: 10px;
+  object-fit: contain;
+}
+
+.thumbnails {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.thumbnails img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 5px;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+
+.thumbnails img:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.product-info {
+  margin-top: 6px;
+}
+
+.product-info p {
+  margin: 2px 0;
+}
+
+.product-info .title {
+  font-weight: bold;
+}
+
+.wooden-cart-button:active {
+  transform: perspective(500px) rotateX(2deg) translateY(2px);
+  box-shadow:
+    inset 0 3px 6px rgba(255, 255, 255, 0.3),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.15),
+    0 2px 8px rgba(0, 0, 0, 0.2);
 }

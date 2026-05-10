@@ -160,7 +160,7 @@ export default function Scene({
       <Environment files="/studio2.hdr" resolution={lowTierDevice ? 16 : 64} />
       {/* <Environment files="/rosendal.hdr" /> */}
       <hemisphereLight
-        args={["#cfe8ff", "#ffffff", 0.45]}
+        args={["#cfe8ff", "#ffffff", 0]}
         position={[100, 300, 100]}
       />
       <ambientLight
@@ -180,21 +180,21 @@ export default function Scene({
         <>
           <directionalLight
             position={[-500, -400, 300]}
-            intensity={100 * desktopLightScale}
+            intensity={400 * desktopLightScale}
           />
           <directionalLight
-            position={[-50, 200, 100]}
-            intensity={90 * desktopLightScale}
+            position={[-50, 200, -30]}
+            intensity={300 * desktopLightScale}
           />
           <pointLight
-            position={[-300, -100, -300]}
-            intensity={30 * desktopLightScale}
+            position={[300, -300, 300]}
+            intensity={300 * desktopLightScale}
           />
         </>
       ) : (
         <pointLight
-          position={[-300, -100, -300]}
-          intensity={45 * sceneBrightness}
+          position={[300, -300, 300]}
+          intensity={450 * sceneBrightness}
         />
       )}
 
