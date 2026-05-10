@@ -190,23 +190,22 @@ export default function Scene({
 
   return (
     <>
-      <Environment files="/studio2.hdr" />
+      <Environment files="/studio2.hdr" resolution={128} />
       {/* <Environment files="/rosendal.hdr" /> */}
       <hemisphereLight
-        args={["#cfe8ff", "#3a2f24", 0.6]}
+        args={["#cfe8ff", "#3a2f24", 0.45]}
         position={[0, 500, 0]}
       />
-      <ambientLight intensity={0.8} />
+      <ambientLight intensity={0.65} />
       <directionalLight
         position={[50, 100, 100]}
-        intensity={50}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
+        intensity={2.2}
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
       />
-      <directionalLight position={[-500, -400, 300]} intensity={40} />
-      <directionalLight position={[0, 20, -80]} intensity={40} />
-      <pointLight position={[300, 100, 300]} intensity={80} />
+      <directionalLight position={[-500, -400, 300]} intensity={0.8} />
+      <directionalLight position={[0, 20, -80]} intensity={0.6} />
+      <pointLight position={[300, 100, 300]} intensity={1.2} />
 
       <group ref={group} position={[0, 0, 0]} scale={[1, 1, 1]}>
         {gltf && gltf.scene ? (

@@ -8,14 +8,40 @@ export default function App() {
   const [rotRight, setRotRight] = useState(false);
   const [showClickText, setShowClickText] = useState(false);
   const [envIntensity, setEnvIntensity] = useState(1);
+  const [contextLost, setContextLost] = useState(false);
 
   return (
     <div className="app-root">
       <Canvas
-        shadows
+        dpr={[1, 1.5]}
+        shadows={false}
+        performance={{ min: 0.6 }}
         gl={{
+          antialias: false,
+          powerPreference: "high-performance",
           toneMapping: THREE.ACESFilmicToneMapping,
           toneMappingExposure: 1.1,
+        }}
+        onCreated={({ gl }) => {
+          const onContextLost = (event) => {
+            event.preventDefault();
+            setContextLost(true);
+          };
+
+          const onContextRestored = () => {
+            setContextLost(false);
+          };
+
+          gl.domElement.addEventListener(
+            "webglcontextlost",
+            onContextLost,
+            false,
+          );
+          gl.domElement.addEventListener(
+            "webglcontextrestored",
+            onContextRestored,
+            false,
+          );
         }}
         camera={{ position: [1, 0.8, 15], fov: 45 }}
         style={{ width: "80vw", height: "60vh" }}
@@ -60,6 +86,12 @@ export default function App() {
 
       {/* Show click message if the model was clicked */}
       {showClickText ? <p className="click-message">Stay strong can.</p> : null}
+
+      {contextLost ? (
+        <p className="click-message">
+          WebGL context lost. Please reload the page.
+        </p>
+      ) : null}
     </div>
   );
 }
