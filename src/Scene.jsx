@@ -154,21 +154,21 @@ export default function Scene({
       ) : null}
       {/* <Environment files="/rosendal.hdr" /> */}
       <hemisphereLight
-        args={["#cfe8ff", "#3a2f24", 0.45]}
-        position={[0, 500, 0]}
+        args={["#cfe8ff", "#ffffff", 0.45]}
+        position={[100, 300, 100]}
       />
       <ambientLight intensity={lowTierDevice ? 0.5 : 0.65} />
       <directionalLight
-        position={[50, 100, 100]}
-        intensity={lowTierDevice ? 1.2 : 2.2}
+        position={[-50, -100, 100]}
+        intensity={lowTierDevice ? 20 : 20}
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
       />
       {!lowTierDevice ? (
         <>
-          <directionalLight position={[-500, -400, 300]} intensity={0.8} />
-          <directionalLight position={[0, 20, -80]} intensity={0.6} />
-          <pointLight position={[300, 100, 300]} intensity={1.2} />
+          <directionalLight position={[-500, -400, 300]} intensity={100} />
+          <directionalLight position={[-50, 200, 100]} intensity={90} />
+          <pointLight position={[-300, -100, -300]} intensity={30} />
         </>
       ) : null}
 
