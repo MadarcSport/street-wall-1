@@ -9,9 +9,11 @@ export default function Scene({
   rotLeft,
   rotRight,
   onModelClick,
-  envIntensity = 1,
-  sceneBrightness = 1,
+  envIntensity = 3,
+  sceneBrightness = 10,
   lowTierDevice = false,
+  modelMetalness = 0.98,
+  modelRoughness = 0.0,
 }) {
   const group = useRef();
   const desktopLightScale = THREE.MathUtils.lerp(
@@ -136,6 +138,22 @@ export default function Scene({
                   material.normalScale.set(normalStrength, normalStrength);
                 }
 
+                if ("metalness" in material) {
+                  material.metalness = THREE.MathUtils.clamp(
+                    modelMetalness,
+                    0,
+                    1,
+                  );
+                }
+
+                if ("roughness" in material) {
+                  material.roughness = THREE.MathUtils.clamp(
+                    modelRoughness,
+                    0,
+                    1,
+                  );
+                }
+
                 material.needsUpdate = true;
               });
             }
@@ -145,7 +163,7 @@ export default function Scene({
         }
       });
     }
-  }, [gltf, gl, lowTierDevice]);
+  }, [gltf, gl, lowTierDevice, modelMetalness, modelRoughness]);
 
   // Lighting setup similar to original
   useFrame(() => {
@@ -183,12 +201,12 @@ export default function Scene({
       <Environment files="/studio2.hdr" resolution={lowTierDevice ? 16 : 64} />
       {/* <Environment files="/rosendal.hdr" /> */}
       <hemisphereLight
-        args={["#cfe8ff", "#ffffff", 0]}
-        position={[100, 300, 100]}
+        args={["#bef1ff", "#108696", 60 * desktopLightScale]}
+        position={[10, 30, 10]}
       />
       <ambientLight
         intensity={
-          lowTierDevice ? 0.85 * sceneBrightness : 0.65 * desktopLightScale
+          lowTierDevice ? 0.95 * sceneBrightness : 0.85 * desktopLightScale
         }
       />
       <directionalLight
@@ -203,21 +221,21 @@ export default function Scene({
         <>
           <directionalLight
             position={[-500, -400, 300]}
-            intensity={400 * desktopLightScale}
+            intensity={40 * desktopLightScale}
           />
           <directionalLight
             position={[-50, 200, -30]}
-            intensity={300 * desktopLightScale}
+            intensity={30 * desktopLightScale}
           />
           <pointLight
             position={[300, -300, 300]}
-            intensity={300 * desktopLightScale}
+            intensity={30 * desktopLightScale}
           />
         </>
       ) : (
         <pointLight
           position={[300, -300, 300]}
-          intensity={450 * sceneBrightness}
+          intensity={20 * sceneBrightness}
         />
       )}
 

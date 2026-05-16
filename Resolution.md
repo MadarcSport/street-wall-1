@@ -16,7 +16,7 @@ Turbopack Error Troubleshooting Guide
 Pine Script Fixes and Explanations
 EdTech Career Pivot for Creative Technologist
 Saving Textures and UV Layouts in Cinema 4D
-Cinema 4D to Three.js Light Export
+Cinema 4D to Three.js Light Export.3
 Facebook Video Ad Performance Analysis
 Cinema 4D to Substance Painter Workflow
 Three.js E-commerce Learning Path
@@ -144,9 +144,11 @@ The most critical factor for sharpness on modern smartphones is the **Device Pix
 - **The Problem:** Most mobile screens have a higher pixel density (Retina/High-DPI). Setting `dpr={[1, 1]}` forces a high-res screen to render at a low resolution, causing a blurry or "pixelated" effect.
 - **The Optimization:** ```javascript
   dpr={lowTierDevice ? [1, 1.5] : [1, 2]}
+
   ```
 
   ```
+
 - **Why:** Capping the DPR at `2` ensures the image looks crisp on high-end phones without overwhelming the GPU. Going to `3` (the native ratio of some phones) often yields diminishing visual returns but significantly increases the rendering load.
 
 ## 2. Antialiasing vs. Performance
